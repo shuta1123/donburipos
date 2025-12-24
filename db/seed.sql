@@ -1,14 +1,14 @@
--- db/seed.sql（あなたの現状に合わせた版）
+-- db/seed.sql
 START TRANSACTION;
 
--- categories（すでに id=2,3,4 を使っている前提）
+-- categories
 INSERT INTO categories (id, name) VALUES
   (2, '丼もの'),
   (3, '飲み物'),
   (4, 'トッピング')
 ON DUPLICATE KEY UPDATE name = VALUES(name);
 
--- menus（すでに id=2..7 を使っている前提）
+-- menus
 INSERT INTO menus (id, name, price, cook, make, category_id) VALUES
   (2, 'マグロ丼', 780, 1, 'A', 2),
   (3, 'サーモン丼', 700, 1, 'A', 2),
