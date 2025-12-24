@@ -1,0 +1,47 @@
+# ======================
+# OS / Editor
+# ======================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ======================
+# MAMP / PHP
+# ======================
+/logs/
+/tmp/
+*.log
+
+# ======================
+# Environment variables
+# ======================
+.env
+.env.*
+
+# ======================
+# Database / Local files
+# ======================
+*.sqlite
+*.db
+*.sql
+DB.xlsx
+
+# ======================
+# Node.js / React
+# ======================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ======================
+# Build outputs
+# ======================
+dist/
+build/
+
+# ======================
+# Cache
+# ======================
+.cache/
