@@ -108,7 +108,7 @@ HTTP API を介して注文データをやり取りする。
 
 ```json
 {
-  "order_number": "01-23",
+  "order_number": "0123",
   "ordered_at": "2025-01-01T12:34:56",
   "in_out": "IN",
   "items": [
@@ -161,7 +161,7 @@ HTTP API を介して注文データをやり取りする。
 [
   {
     "order_id": 123,
-    "order_number": "01-23",
+    "order_number": "0123",
     "ordered_at": "2025-01-01T12:34:56",
     "in_out": "IN",
     "items": [
