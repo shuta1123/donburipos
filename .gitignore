@@ -45,3 +45,4 @@ build/
 # Cache
 # ======================
 .cache/
+config.php
