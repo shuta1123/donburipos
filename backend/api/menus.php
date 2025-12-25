@@ -13,6 +13,12 @@
         $sth=$dbh->prepare($sql);
         $sth->execute(array(':category'=>(int)$category));
         $result=$sth->fetchALL(PDO::FETCH_ASSOC);
+        if(count($result)===0){
+            header('HTTP/1.1 404 Not Found');
+            
+            echo json_encode(["error" => "notfound"]);
+            exit();
+        }
         $json=json_encode($result);
         
         if($json===false){
