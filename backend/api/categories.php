@@ -10,6 +10,7 @@
         if($json===false){
             header('HTTP/1.1 500 Internal Server Error');
             echo json_encode(["error" => "json_encode_error"]);
+            error_log(json_last_error_msg());
             exit();
         }
         header('HTTP/1.1 200 OK');
