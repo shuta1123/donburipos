@@ -348,9 +348,7 @@ C画面でのレシート発行や詳細確認に使用する。
   "state_B": true,
   "items": [
     {
-      "menu_id": 10,
       "name": "牛丼",
-      "price": 550,
       "cook": true,
       "make": "A",
       "quantity": 1
@@ -429,14 +427,42 @@ B画面でドリンク作成完了時に呼び出す。
 ```
 
 ### GET `/api/menus`
+
+商品マスタ（menus テーブル）を  
+**カテゴリ単位で取得するための API**。
+
+主に **注文画面（Z）での商品一覧表示**に使用し、  
+カテゴリタブの切り替えに応じて呼び出される。
+
+---
+
+### 取得仕様
+
+- **必ずカテゴリIDを指定して取得する**
+- カテゴリ未指定の場合はエラーとする
+
+#### Query Parameters（必須）
+
+| パラメータ | 内容 |
+|---|---|
+| category_id | 取得対象のカテゴリID |
+
+---
+
+### Response
+
 ```json
 [
   {
     "menu_id": 10,
     "name": "牛丼",
     "price": 550,
-    "cook": true,
-    "make": "A",
+    "category_id": 1
+  },
+  {
+    "menu_id": 11,
+    "name": "豚丼",
+    "price": 520,
     "category_id": 1
   }
 ]
