@@ -455,15 +455,11 @@ B画面でドリンク作成完了時に呼び出す。
 [
   {
     "menu_id": 10,
-    "name": "牛丼",
-    "price": 550,
-    "category_id": 1
+    "name": "牛丼"
   },
   {
     "menu_id": 11,
-    "name": "豚丼",
-    "price": 520,
-    "category_id": 1
+    "name": "豚丼"
   }
 ]
 ```
