@@ -251,7 +251,7 @@ README と併せて本ドキュメントを参照することで、
 
 ## 1) 注文作成（Z：会計確定）
 
-### POST `/api/orders`
+### POST `/api/orders.php`
 
 Z画面で **会計キーが押された時点**で呼び出される。  
 **1会計＝1注文**として注文と注文明細を登録する。
@@ -297,7 +297,7 @@ Z画面で **会計キーが押された時点**で呼び出される。
 
 ## 2) 注文一覧取得（画面表示用）
 
-### GET `/api/orders`
+### GET `/api/orders.php`
 
 各画面が表示対象の注文を取得する。
 
@@ -333,7 +333,7 @@ Z画面で **会計キーが押された時点**で呼び出される。
 
 ## 3) 注文詳細取得（レシート・確認用）
 
-### GET `/api/orders/{order_id}`
+### GET `/api/orders?id={order_id}`
 
 C画面でのレシート発行や詳細確認に使用する。
 
@@ -362,7 +362,7 @@ C画面でのレシート発行や詳細確認に使用する。
 
 ## 4) 状態更新（工程ボタン操作）
 
-### PATCH `/api/orders/{order_id}/state`
+### PATCH `/api/orders_state.php?id={order_id}`
 
 工程ボタン操作による状態遷移を行う。  
 **クライアントは state を直接指定せず、action を送信する。**
@@ -395,7 +395,7 @@ C画面でのレシート発行や詳細確認に使用する。
 
 ## 5) ドリンク完了（B画面）
 
-### PATCH `/api/orders/{order_id}/drink`
+### PATCH `/api/orders_drink.php?id={order_id}`
 
 B画面でドリンク作成完了時に呼び出す。
 
@@ -418,7 +418,7 @@ B画面でドリンク作成完了時に呼び出す。
 
 ## 6) マスタ取得
 
-### GET `/api/categories`
+### GET `/api/categories.php`
 ```json
 [
   { "category_id": 1, "name": "丼" },
@@ -426,7 +426,7 @@ B画面でドリンク作成完了時に呼び出す。
 ]
 ```
 
-### GET `/api/menus`
+### GET `/api/menus.php`
 
 商品マスタ（menus テーブル）を  
 **カテゴリ単位で取得するための API**。
@@ -470,8 +470,8 @@ B画面でドリンク作成完了時に呼び出す。
 
 | 画面 | 使用API |
 |---|---|
-| Z | POST `/api/orders` |
-| A | GET `/api/orders?state=A` / PATCH `/state` |
-| B | GET `/api/orders?state_B=true` / PATCH `/drink` |
-| C | GET `/api/orders?state=C` / GET `/orders/{id}` / PATCH `/state` |
-| D | GET `/api/orders?state_in=D,cool` / PATCH `/state` |
+| Z | POST `/api/orders.php` |
+| A | GET `/api/orders.php?state=A` / PATCH `/api/orders_state.php?id={order_id}` |
+| B | GET `/api/orders.php?state_B=true` / PATCH `/api/orders_drink.php?id={order_id}` |
+| C | GET `/api/orders.php?state=C` / GET `/api/orders.php?id={order_id}` / PATCH `/api/orders_state.php?id={order_id}` |
+| D | GET `/api/orders.php?state_in=D,cool` / PATCH `/api/orders_state.php?id={order_id}` |
