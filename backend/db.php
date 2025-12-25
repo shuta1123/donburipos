@@ -3,8 +3,10 @@
 
     function connectDB(){
         try{
-            error_log("test");
-            return new PDO(DSN,DB_USER,DB_PASSWORD);
+            // error_log("test");
+            $dbh = new PDO(DSN, DB_USER, DB_PASSWORD);
+            $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $dbh;
         }catch(PDOException $e){
             error_log($e->getMessage());
             exit();
