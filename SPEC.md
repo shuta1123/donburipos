@@ -72,7 +72,7 @@ erDiagram
 |---|---|---|
 | id | int | 主キー |
 | cash_num | char | レジ番号 |
-| order_num | char | 表示用注文番号（0123形式） |
+| order_num | char | 表示用注文番号（23形式） |
 | ordered_at | datetime | 会計キー押下時の日時 |
 | in_out | string | IN（店内） / OUT（持ち帰り） |
 | state | string | 注文の進捗状態 |
@@ -260,8 +260,6 @@ Z画面で **会計キーが押された時点**で呼び出される。
 ```json
 {
   "cash_num": "01",
-  "order_num": "0123",
-  "ordered_at": "2025-12-24T22:00:00",
   "in_out": "IN",
   "items": [
     { "menu_id": 10, "quantity": 1 },
@@ -287,7 +285,7 @@ Z画面で **会計キーが押された時点**で呼び出される。
 {
   "result": "ok",
   "order_id": 123,
-  "order_num": "0123",
+  "display_order_num": "0123",
   "state": "A",
   "state_B": true
 }
@@ -320,7 +318,7 @@ Z画面で **会計キーが押された時点**で呼び出される。
 [
   {
     "order_id": 123,
-    "order_num": "0123",
+    "display_order_num": "0123",
     "ordered_at": "2025-12-24T22:00:00",
     "in_out": "IN",
     "state": "C",
@@ -341,7 +339,7 @@ C画面でのレシート発行や詳細確認に使用する。
 ```json
 {
   "order_id": 123,
-  "order_num": "0123",
+  "display_order_num": "0123",
   "ordered_at": "2025-12-24T22:00:00",
   "in_out": "IN",
   "state": "C",
