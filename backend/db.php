@@ -5,8 +5,7 @@
         try{
             error_log("test");
             return new PDO(DSN,DB_USER,DB_PASSWORD);
-            
-        }catch(){
+        }catch(PDOException $e){
             error_log($e->getMessage());
             exit();
         }
