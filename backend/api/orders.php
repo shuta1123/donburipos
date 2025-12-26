@@ -226,24 +226,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             exit();
         }
 
-        if($_GET["screen"]==='A'||$_GET["screen"]==='C'){
-            $sql="SELECT `id`,`cash_num`,`order_num`,`in_out`
-                  FROM `orders`
-                  WHERE `state`=:state";
-            $sth=$dbh->prepare($sql);
-            $sth->execute([':state'=>$_GET["screen"]]);
+        $screen = (string)$_GET["screen"];
 
-        }else if($_GET["screen"]==='B'){
-            $sql="SELECT `id`,`cash_num`,`order_num`,`in_out`
-                  FROM `orders`
-                  WHERE `state_B`=1";
+        if($screen === 'A' || $screen === 'C'){
+            $sql="SELECT id, cash_num, order_num, in_out, state
+                  FROM orders
+                  WHERE state = :state
+                  ORDER BY ordered_at ASC, id ASC";
+            $sth=$dbh->prepare($sql);
+            $sth->execute([':state'=>$screen]);
+
+        }else if($screen === 'B'){
+            $sql="SELECT id, cash_num, order_num, in_out, state
+                  FROM orders
+                  WHERE state_B = 1
+                  ORDER BY ordered_at ASC, id ASC";
             $sth=$dbh->prepare($sql);
             $sth->execute();
 
-        }else if($_GET["screen"]==='D'){
-            $sql="SELECT `id`,`cash_num`,`order_num`,`in_out`
-                  FROM `orders`
-                  WHERE `state`='D' OR `state`='cool'";
+        }else if($screen === 'D'){
+            $sql="SELECT id, cash_num, order_num, in_out, state
+                  FROM orders
+                  WHERE state IN ('D','cool')
+                  ORDER BY ordered_at ASC, id ASC";
             $sth=$dbh->prepare($sql);
             $sth->execute();
 
@@ -253,48 +258,47 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             exit();
         }
 
-        $result=$sth->fetchALL(PDO::FETCH_ASSOC);
+        $result=$sth->fetchAll(PDO::FETCH_ASSOC);
         $res = [];
 
         for ($i = 0; $i < count($result); $i++) {
             $display = sprintf('%02d%02d', (int)$result[$i]['cash_num'], (int)$result[$i]['order_num']);
+            $state = (string)$result[$i]["state"];
 
             $order = [
                 "order_id" => (int)$result[$i]["id"],
                 "display_order_num" => $display,
                 "in_out" => $result[$i]["in_out"],
+                "state" => $state,
                 "items" => []
             ];
 
-            $sql = "SELECT oi.menu_id, oi.quantity, m.name
-                    FROM order_items oi
-                    INNER JOIN menus m ON m.id = oi.menu_id
-                    WHERE oi.order_id = :order_id
-                    ORDER BY oi.id ASC";
-            $sth = $dbh->prepare($sql);
-            $sth->execute([":order_id" => (int)$result[$i]["id"]]);
-            $items = $sth->fetchAll(PDO::FETCH_ASSOC);
+            // ★ D画面かつ state=cool のときだけ items を返さない（空のまま）
+            $shouldHideItems = ($screen === 'D' && $state === 'cool');
 
-            for ($j = 0; $j < count($items); $j++) {
-                $order["items"][] = [
-                    "name" => $items[$j]["name"],
-                    "quantity" => (int)$items[$j]["quantity"]
-                ];
+            if(!$shouldHideItems){
+                $sql = "SELECT m.name, oi.quantity
+                        FROM order_items oi
+                        INNER JOIN menus m ON m.id = oi.menu_id
+                        WHERE oi.order_id = :order_id
+                        ORDER BY oi.id ASC";
+                $sth2 = $dbh->prepare($sql);
+                $sth2->execute([":order_id" => (int)$result[$i]["id"]]);
+                $items = $sth2->fetchAll(PDO::FETCH_ASSOC);
+
+                for ($j = 0; $j < count($items); $j++) {
+                    $order["items"][] = [
+                        "name" => $items[$j]["name"],
+                        "quantity" => (int)$items[$j]["quantity"]
+                    ];
+                }
             }
 
             $res[] = $order;
         }
 
-        $json=json_encode($res);
-        if($json===false){
-            header('HTTP/1.1 500 Internal Server Error');
-            echo json_encode(["error" => "json_encode_error"]);
-            error_log(json_last_error_msg());
-            exit();
-        }
-
         header('HTTP/1.1 200 OK');
-        echo $json;
+        echo json_encode($res);
 
     }catch(PDOException $e){
         header('HTTP/1.1 500 Internal Server Error');
@@ -302,6 +306,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         error_log($e->getMessage());
         exit();
     }
+
 
 }else{
     header('HTTP/1.1 405 Method Not Allowed');
