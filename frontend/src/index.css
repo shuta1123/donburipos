@@ -1,0 +1,14 @@
+/* src/index.css */
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111;
+  background: #f6f6f6;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  cursor: pointer;
+}
