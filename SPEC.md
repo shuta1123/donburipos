@@ -295,23 +295,20 @@ Z画面で **会計キーが押された時点**で呼び出される。
 
 ## 2) 注文一覧取得（画面表示用）
 
-### GET `/api/orders.php`
+### GET `/api/orders.php?screen={screen_ID}`
 
 各画面が表示対象の注文を取得する。
 
 ### Query Parameters
 | パラメータ | 内容 |
 |---|---|
-| state | 特定stateのみ取得 |
-| state_in | 複数state（例：`D,cool`） |
-| state_B | `true / false` |
-| date | 日付指定（将来の集計用） |
+| screen | A / B / C / D |
 
 ### 用途例
-- A画面：`state=A`
-- C画面：`state=C`
-- D画面：`state_in=D,cool`
-- B画面：`state_B=true`
+- A画面：screen=A`state=A`
+- C画面：screen=C`state=C`
+- D画面：screen=D（サーバ側で state IN ('D','cool') に変換）
+- B画面：screen=B（サーバ側で state_B=true に変換）
 
 ### Response
 ```json
@@ -319,10 +316,13 @@ Z画面で **会計キーが押された時点**で呼び出される。
   {
     "order_id": 123,
     "display_order_num": "0123",
-    "ordered_at": "2025-12-24T22:00:00",
     "in_out": "IN",
-    "state": "C",
-    "state_B": true
+    "items":[
+      {
+      "name":"牛丼",
+      "quantity": 1
+      },
+    ]
   }
 ]
 ```
@@ -340,10 +340,7 @@ C画面でのレシート発行や詳細確認に使用する。
 {
   "order_id": 123,
   "display_order_num": "0123",
-  "ordered_at": "2025-12-24T22:00:00",
   "in_out": "IN",
-  "state": "C",
-  "state_B": true,
   "items": [
     {
       "name": "牛丼",
@@ -469,7 +466,7 @@ B画面でドリンク作成完了時に呼び出す。
 | 画面 | 使用API |
 |---|---|
 | Z | POST `/api/orders.php` |
-| A | GET `/api/orders.php?state=A` / PATCH `/api/orders_state.php?id={order_id}` |
-| B | GET `/api/orders.php?state_B=true` / PATCH `/api/orders_drink.php?id={order_id}` |
-| C | GET `/api/orders.php?state=C` / GET `/api/orders.php?id={order_id}` / PATCH `/api/orders_state.php?id={order_id}` |
-| D | GET `/api/orders.php?state_in=D,cool` / PATCH `/api/orders_state.php?id={order_id}` |
+| A | GET `/api/orders.php?screen=A` / PATCH `/api/orders_state.php?id={order_id}` |
+| B | GET `/api/orders.php?screen=B` / PATCH `/api/orders_drink.php?id={order_id}` |
+| C | GET `/api/orders.php?screen=C` / GET `/api/orders.php?id={order_id}` / PATCH `/api/orders_state.php?id={order_id}` |
+| D | GET `/api/orders.php?screen=D` / PATCH `/api/orders_state.php?id={order_id}` |
