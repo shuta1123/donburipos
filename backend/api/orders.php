@@ -89,6 +89,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         }else{
             $res=array("order_id"=>$orderId,"display_order_num"=>$display,"state"=>"C","state_B"=>$makeB);
         }
+        $res["result"] = "ok";
         $json=json_encode($res);
         if($json===false){
             header('HTTP/1.1 500 Internal Server Error');
@@ -107,9 +108,91 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         error_log($e->getMessage());
         exit();
     }
+
+
+
+
 }else if($_SERVER["REQUEST_METHOD"] == "GET"&&isset($_GET["id"])){
 
+
+
+
+
 }else if($_SERVER["REQUEST_METHOD"] == "GET"){
+    try{
+        if(!isset($_GET["screen"])){
+            header('HTTP/1.1 400 Bad Request');
+            echo json_encode(["error" => "Bad_Request"]);
+            exit();
+        }
+        if($_GET["screen"]==='A'||$_GET["screen"]==='C'){
+            $sql="SELECT `id`,`cash_num`,`order_num`,`in_out` FROM `orders` WHERE `state`=:screen";
+            $sth=$dbh->prepare($sql);
+            $sth->execute(array(':screen'=>$_GET["screen"]));
+        }else if($_GET["screen"]=='B'){
+            $sql="SELECT `id`,`cash_num`,`order_num`,`in_out` FROM `orders` WHERE `state_B`=:screen";
+            $sth=$dbh->prepare($sql);
+            $sth->execute(array(':screen'=>true));
+        }else if($_GET["screen"]==='D'){
+            $sql="SELECT `id`,`cash_num`,`order_num`,`in_out` FROM `orders` WHERE `state`=:screenA OR `state`=:screenB";
+            $sth=$dbh->prepare($sql);
+            $sth->execute(array(':screenA'=>$_GET["screen"],':screenB'=>"cool"));
+        }else{
+            header('HTTP/1.1 400 Bad Request');
+            echo json_encode(["error" => "Bad_Request"]);
+            exit();
+        }
+        $result=$sth->fetchALL(PDO::FETCH_ASSOC);
+        $res = [];
+
+        for ($i = 0; $i < count($result); $i++) {
+            $display = sprintf('%02d%02d', $result[$i]['cash_num'], $result[$i]['order_num']);
+
+            $order = [
+                "order_id" => $result[$i]["id"],
+                "display_order_num" => $display,
+                "in_out" => $result[$i]["in_out"],
+                "items" => []
+            ];
+
+            // items を取得
+            $sql = "SELECT menu_id, quantity FROM order_items WHERE order_id = :order_id";
+            $sth = $dbh->prepare($sql);
+            $sth->execute([":order_id" => $result[$i]["id"]]);
+            $items = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+            for ($j = 0; $j < count($items); $j++) {
+                $sql = "SELECT name FROM menus WHERE id = :menu_id";
+                $sth = $dbh->prepare($sql);
+                $sth->execute([":menu_id" => $items[$j]["menu_id"]]);
+                $menu = $sth->fetch(PDO::FETCH_ASSOC);
+
+                $order["items"][] = [
+                    "name" => $menu["name"],
+                    "quantity" => $items[$j]["quantity"]
+                ];
+            }
+
+            // 1注文分を追加
+            $res[] = $order;
+        }
+
+        $json=json_encode($res);
+        if($json===false){
+            header('HTTP/1.1 500 Internal Server Error');
+            echo json_encode(["error" => "json_encode_error"]);
+            error_log(json_last_error_msg());
+            exit();
+        }
+        header('HTTP/1.1 200 OK');
+        echo $json;
+    }catch(PDOException $e){
+        header('HTTP/1.1 500 Internal Server Error');
+        echo json_encode(["error" => "db_error"]);
+        error_log($e->getMessage());
+        exit();
+    }
+
 
 }else{
     header('HTTP/1.1 405 Method Not Allowed');
